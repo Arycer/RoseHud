@@ -2,25 +2,28 @@
   "schemaVersion": 1,
   "id": "rosehud",
   "version": "${version}",
-
   "name": "RoseHud",
   "description": "",
   "authors": [],
-  "contact": {},
-
+  "contact": {
+    "repo": "https://github.com/Eufonia-Studio/RoseHud"
+  },
   "license": "All-Rights-Reserved",
-  "icon": "assets/rosehud/icon.png",
-
   "environment": "*",
-  "entrypoints": {},
-
-      "mixins": [
-        "rosehud.mixins.json"
-      ],
-
+  "entrypoints": {
+    "client": [
+      "me.arycer.rosehud.RoseHudClient"
+    ],
+    "server": [
+      "me.arycer.rosehud.RoseHudServer"
+    ]
+  },
+  "mixins": [
+    "rosehud.mixins.json"
+  ],
   "depends": {
     "fabricloader": ">=${loader_version}",
-        "fabric": "*",
+    "fabric": "*",
     "minecraft": "${minecraft_version}"
   }
 }

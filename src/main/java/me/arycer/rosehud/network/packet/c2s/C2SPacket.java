@@ -1,4 +1,4 @@
-package me.arycer.rosehud.network.c2s;
+package me.arycer.rosehud.network.packet.c2s;
 
 import net.fabricmc.fabric.api.networking.v1.FabricPacket;
 

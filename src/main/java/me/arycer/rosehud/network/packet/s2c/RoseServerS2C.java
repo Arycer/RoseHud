@@ -1,9 +1,6 @@
-package me.arycer.rosehud.network.s2c;
+package me.arycer.rosehud.network.packet.s2c;
 
-import me.arycer.rosehud.RoseHudClient;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.PacketType;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
@@ -16,6 +13,9 @@ public class RoseServerS2C implements S2CPacket {
     public RoseServerS2C(PacketByteBuf packetByteBuf) {
     }
 
+    public RoseServerS2C() {
+    }
+
     @Override
     public void write(PacketByteBuf buf) {
     }
@@ -23,9 +23,5 @@ public class RoseServerS2C implements S2CPacket {
     @Override
     public PacketType<?> getType() {
         return TYPE;
-    }
-
-    public static void recieve(RoseServerS2C packet, ClientPlayerEntity player, PacketSender sender) {
-        RoseHudClient.getInstance().getInfoHud().setRoseServer(true);
     }
 }
