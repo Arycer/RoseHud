@@ -10,7 +10,6 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.hud.DebugHud;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -31,6 +30,7 @@ public class InfoHud {
     private static final WeatherBox WEATHER_BOX = new WeatherBox();
     private static final SessionTimeBox SESSION_TIME_BOX = new SessionTimeBox();
     private static final DayBox DAY_BOX = new DayBox();
+    private static final TimeOfDayBox TIME_OF_DAY_BOX = new TimeOfDayBox();
 
     public void register() {
         ClientLoginConnectionEvents.DISCONNECT.register((handler, client) -> setRoseServer(false));
@@ -42,12 +42,13 @@ public class InfoHud {
                 return;
             }
 
-            PING_BOX.render(drawContext, MinecraftClient.getInstance().textRenderer);
             COORDINATES_BOX.render(drawContext, MinecraftClient.getInstance().textRenderer);
+            PING_BOX.render(drawContext, MinecraftClient.getInstance().textRenderer);
             TIME_BOX.render(drawContext, MinecraftClient.getInstance().textRenderer);
             WEATHER_BOX.render(drawContext, MinecraftClient.getInstance().textRenderer);
             SESSION_TIME_BOX.render(drawContext, MinecraftClient.getInstance().textRenderer);
             DAY_BOX.render(drawContext, MinecraftClient.getInstance().textRenderer);
+            TIME_OF_DAY_BOX.render(drawContext, MinecraftClient.getInstance().textRenderer);
         });
 
         ClientTickEvents.START_WORLD_TICK.register(world -> {
@@ -97,15 +98,16 @@ public class InfoHud {
             width = client.textRenderer.getWidth(renderString) + 5;
             height = client.textRenderer.fontHeight + 3;
 
-            drawContext.fill(POS_X - 5, POS_Y - 5, POS_X + width, POS_Y + height, 0x80000000);
-            drawContext.drawTextWithShadow(textRenderer, renderString, POS_X, POS_Y, 0xffffff);
+            final int posX = POS_X + COORDINATES_BOX.getWidth() + 8;
+
+            drawContext.fill(posX - 5, POS_Y - 5, posX + width, POS_Y + height, 0x80000000);
+            drawContext.drawTextWithShadow(textRenderer, renderString, posX, POS_Y, 0xffffff);
         }
     }
 
     @Getter
     private static class CoordinatesBox {
         private int width;
-        private int height;
 
         public void render(DrawContext drawContext, TextRenderer textRenderer) {
             ClientPlayerEntity player = MinecraftClient.getInstance().player;
@@ -120,13 +122,10 @@ public class InfoHud {
             String renderString = String.format("X: %s  Y: %s  Z: %s", x, y, z);
 
             width = MinecraftClient.getInstance().textRenderer.getWidth(renderString) + 5;
-            height = MinecraftClient.getInstance().textRenderer.fontHeight + 3;
+            final int boxHeight = MinecraftClient.getInstance().textRenderer.fontHeight + 3;
 
-            MinecraftClient client = MinecraftClient.getInstance();
-            final int posX = POS_X * (client.isIntegratedServerRunning() ? 1 : 2) + PING_BOX.getWidth();
-
-            drawContext.fill(posX - 5, POS_Y - 5, posX + width, POS_Y + height, 0x80000000);
-            drawContext.drawTextWithShadow(textRenderer, renderString, posX, POS_Y, 0xffffff);
+            drawContext.fill(POS_X - 5, POS_Y - 5, POS_X + width, POS_Y + boxHeight, 0x80000000);
+            drawContext.drawTextWithShadow(textRenderer, renderString, POS_X, POS_Y, 0xffffff);
         }
     }
 
@@ -246,9 +245,40 @@ public class InfoHud {
             final int BOX_WIDTH = client.textRenderer.getWidth(renderString) + 5;
             final int BOX_HEIGHT = client.textRenderer.fontHeight + 3;
 
-            final int posX = client.getWindow().getScaledWidth() - (POS_X + TIME_BOX.getWidth() + BOX_WIDTH + 3) - WEATHER_BOX.getWidth() - 8;
+            final int posX = client.getWindow().getScaledWidth() - (POS_X + TIME_BOX.getWidth() + BOX_WIDTH + 3) - WEATHER_BOX.getWidth() - 8 - TIME_OF_DAY_BOX.getWidth() - 8;
 
             drawContext.fill(posX - 5, POS_Y - 5, posX + BOX_WIDTH, POS_Y + BOX_HEIGHT, 0x80000000);
+            drawContext.drawTextWithShadow(textRenderer, renderString, posX, POS_Y, 0xffffff);
+        }
+    }
+
+    @Getter
+    private static class TimeOfDayBox {
+        private int width;
+        public void render(DrawContext drawContext, TextRenderer textRenderer) {
+            MinecraftClient client = MinecraftClient.getInstance();
+            if (client == null || client.options.hudHidden) {
+                return;
+            }
+
+            World world = client.world;
+            if (world == null) {
+                return;
+            }
+
+            long time = world.getTimeOfDay();
+            while (time > 24000) {
+                time -= 24000;
+            }
+
+            String renderString = Util.ticksToTime(time);
+
+            width = client.textRenderer.getWidth(renderString) + 5;
+            final int BOX_HEIGHT = client.textRenderer.fontHeight + 3;
+
+            final int posX = client.getWindow().getScaledWidth() - (POS_X + TIME_BOX.getWidth() + width + 3) - WEATHER_BOX.getWidth() - 8;
+
+            drawContext.fill(posX - 5, POS_Y - 5, posX + width, POS_Y + BOX_HEIGHT, 0x80000000);
             drawContext.drawTextWithShadow(textRenderer, renderString, posX, POS_Y, 0xffffff);
         }
     }

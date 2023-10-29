@@ -1,8 +1,10 @@
 package me.arycer.rosehud.network;
 
+import me.arycer.rosehud.network.handler.RoseClientHandler;
 import me.arycer.rosehud.network.handler.RoseServerHandler;
 import me.arycer.rosehud.network.handler.WeatherTimeHandler;
 import me.arycer.rosehud.network.packet.c2s.C2SPacket;
+import me.arycer.rosehud.network.packet.c2s.RoseClientC2S;
 import me.arycer.rosehud.network.packet.s2c.RoseServerS2C;
 import me.arycer.rosehud.network.packet.s2c.S2CPacket;
 import me.arycer.rosehud.network.packet.s2c.WeatherTimeS2C;
@@ -22,6 +24,7 @@ public class PacketHandler {
 
     @Environment(EnvType.SERVER)
     public static void registerServer() {
+        ServerPlayNetworking.registerGlobalReceiver(RoseClientC2S.TYPE, RoseClientHandler::receive);
     }
 
     public static void sendToServer(C2SPacket packet){

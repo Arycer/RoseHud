@@ -1,11 +1,9 @@
 package me.arycer.rosehud;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldProperties;
 import net.minecraft.world.level.ServerWorldProperties;
 
 import java.text.SimpleDateFormat;
